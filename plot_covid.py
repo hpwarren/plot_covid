@@ -34,6 +34,7 @@ class update_covid:
     def read_data(self):
         df = pd.read_csv(self.filename)
         md = df[df['state'] == self.state]
+        print(md)
         dates = np.flip(np.array(md.date)) # read dates in YYYYMMDD format
         dates = convert_time(dates) # convert to datetime
         nday = np.arange(len(md)) # dates as integer array
@@ -71,13 +72,18 @@ class update_covid:
             n = int(day)
             d = (date0 + timedelta(days=n)).strftime('%d-%b-%Y')
             est_deaths = pfit[n]*ratio
+
             if n < len(deaths):
                 num = deaths[n]
                 if np.isnan(num): num = 0
                 act_deaths = f'{num:,.0f}'
+                act_pos = self.data['positive'][n]
+                act_pos = f'{act_pos:10,.0f}'
             else:
                 act_deaths = '---'
-            print(f'{n:3d}{d:>15}{pfit[n]:10,.0f}{est_deaths:10,.0f} {act_deaths:>10}')
+                act_pos = '---'
+            print(f'{n:3d}{d:>15}{act_pos:>10}{pfit[n]:10,.0f}'\
+                  f'{est_deaths:10,.0f}{act_deaths:>10}')
         
         return days, pfit
 
