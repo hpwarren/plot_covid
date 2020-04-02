@@ -27,7 +27,7 @@ class update_covid:
 
     def get_data(self):
         if not os.path.isfile(self.filename):
-            com = f'curl -o {self.filename} http://covidtracking.com/api/states/daily.csv'
+            com = f'curl -o {self.filename} https://covidtracking.com/api/states/daily.csv'
             subprocess.call(com, shell=True)
             print(f' + downloaded {self.filename}')
 
