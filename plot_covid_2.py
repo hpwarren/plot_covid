@@ -46,13 +46,12 @@ class update_covid:
 
     def fit_data(self, remove=0):
         x = self.data['nday']
-        y = self.data['positive']
+        y = self.data['deaths']
         good = np.isfinite(y)
         x = x[good]
         y = y[good]
         x = x[:len(x)-remove]
         y = y[:len(y)-remove]
-        print(len(x))
         popt, pcov = curve_fit(funct, x, y, p0=[1,1])
         self.popt = popt
 
@@ -60,13 +59,13 @@ class update_covid:
         pos = self.data['positive']
         deaths = self.data['deaths']
         good = np.where(np.isfinite(deaths) == True)
-        ratio = deaths[good]/pos[good]
+        ratio = 1/(deaths[good]/pos[good])
         return np.median(ratio)
 
     def extrapolate_fit(self):
         days = np.arange(120)
         pfit = funct(days, self.popt[0], self.popt[1])
-        match = np.where(pfit <= 1.0E+6)
+        match = np.where(pfit <= 1.0E+4)
         days = days[match]
         pfit = pfit[match]
 
@@ -78,7 +77,8 @@ class update_covid:
         for day in days:
             n = int(day)
             d = (date0 + timedelta(days=n)).strftime('%d-%b-%Y')
-            est_deaths = pfit[n]*ratio
+            est_deaths = pfit[n]            
+            est_pos = pfit[n]*ratio
 
             if n < len(deaths):
                 num = deaths[n]
@@ -89,7 +89,7 @@ class update_covid:
             else:
                 act_deaths = '---'
                 act_pos = '---'
-            print(f'{n:3d}{d:>15}{act_pos:>10}{pfit[n]:10,.0f}'\
+            print(f'{n:3d}{d:>15}{act_pos:>10}{est_pos:10,.0f}'\
                   f'{est_deaths:10,.0f}{act_deaths:>10}')
         
         return days, pfit
@@ -104,9 +104,9 @@ class update_covid:
 
         plt.semilogy(self.data['nday'], self.data['positive'], 'o', color='C0', \
                      label='Actual Positive')
-        plt.semilogy(t, pfit, ':', label='Modeled Positive', color='C0')
+        plt.semilogy(t, pfit*ratio, ':', label='Modeled Positive', color='C0')
         plt.semilogy(self.data['nday'], self.data['deaths'], 'or', label='Actual Deaths')
-        plt.semilogy(t, pfit*ratio, ':r', label='Modeled Deaths')
+        plt.semilogy(t, pfit, ':r', label='Modeled Deaths')
         plt.xlabel('Days Since March 4, 2020')
         plt.ylabel('Cummulative Positive Cases')
         plt.title(title, fontsize=10)
