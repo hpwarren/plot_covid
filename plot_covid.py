@@ -99,7 +99,7 @@ class update_covid:
         ratio = self.calc_ratio()
 
         period = 1/self.popt[1]
-        title = f'COVID Data for {self.state} | Doubling Peroid = {period:0.1f} days'\
+        title = f'COVID Data for {self.state} | Doubling Period = {period:0.1f} days'\
             f' | Death Ratio = {ratio:0.3f}'
 
         plt.semilogy(self.data['nday'], self.data['positive'], 'o', color='C0', \
