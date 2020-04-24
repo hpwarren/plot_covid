@@ -79,7 +79,7 @@ class update_covid:
         return np.median(ratio)
 
     def extrapolate_fit(self):
-        days = np.arange(120)
+        days = np.arange(365)
         pfit = funct(days, self.popt[0], self.popt[1])
         match = np.where(pfit <= 1.0E+4)
         days = days[match]
